@@ -1,6 +1,6 @@
 package rcss
 
-type Side byte
+type Side rune
 
 const (
 	LeftSide Side = 'l'

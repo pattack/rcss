@@ -1,32 +1,10 @@
 package rcss
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"net"
+	"strconv"
 )
-
-// Output Driver
-type Match interface {
-	Join(team Team) error
-	Reconnect(team Team, unum UniformNumber) error
-	Bye() error
-
-	Catch() error
-	ChangeView() error
-	Dash() error
-	Kick() error
-	Move(x, y int) error
-	Say() error
-	Turn() error
-	TurnNeck() error
-
-	Score() error
-
-	See() error
-	SenseBody() error
-}
 
 type Server interface {
 	Match
@@ -36,7 +14,7 @@ type Server interface {
 
 type server struct {
 	raddr *net.UDPAddr
-	conn net.PacketConn
+	conn  net.PacketConn
 }
 
 func NewServer(addr string) (Server, error) {
@@ -47,7 +25,7 @@ func NewServer(addr string) (Server, error) {
 	} else {
 		srv := &server{
 			raddr: raddr,
-			conn: conn,
+			conn:  conn,
 		}
 
 		return srv, nil
@@ -67,46 +45,95 @@ func (s server) bind(team Team) {
 
 			return
 		} else {
-			scn := bufio.NewScanner(bytes.NewReader(l))
-			scn.Split(bufio.ScanWords)
+			var msg message
+			if err := msg.UnmarshalBinary(l); err != nil {
+				fmt.Printf("message parse error: %s\n", err)
 
-			if scn.Scan() {
-				switch scn.Text() {
-				case "(init":
-					scn.Scan()
-					scn.Text()
-					side := LeftSide
+				continue
+			}
 
-					scn.Scan()
-					scn.Text()
-					unum := UniformNumber(1)
+			//fmt.Printf("%#v\n", msg)
 
-					scn.Scan()
-					scn.Text()
-					mode := BeforeKickOff
+			switch msg.name {
+			case "init":
+				var side Side
+				var unum UniformNumber
+				var mode PlayMode
 
-					team.Init(s, side, unum, mode)
+				if _, err := fmt.Sscanf(msg.values[0], "%c", &side); err != nil {
+					fmt.Printf("side error %s\n", err)
 
-				case "(see":
-
-				case "(sense_body":
-
-				case "(error":
-
-				default:
-					fmt.Printf("unhandled server input: `%s`\n", scn.Text())
+					continue
 				}
+
+				if _, err := fmt.Sscan(msg.values[1], &unum); err != nil {
+					fmt.Printf("unum error %s\n", err)
+
+					continue
+				}
+
+				if _, err := fmt.Sscan(msg.values[2], &mode); err != nil {
+					fmt.Printf("mode error %s\n", err)
+
+					continue
+				}
+
+				go team.Init(s, side, unum, mode)
+
+			case "server_param":
+
+			case "player_param":
+
+			case "player_type":
+
+			case "see":
+
+			case "hear":
+
+			case "sense_body":
+
+			case "score":
+
+			case "error":
+
+			default:
+				fmt.Printf("unhandled server input: `%s`\n", msg.name)
 			}
 		}
 	}
 }
 
+func newInitCommand(teamName string, goalie bool, version int) message {
+	msg := message{name: "init"}
+
+	msg.AddValues(teamName)
+	if version > 0 {
+		ver := message{name: "version"}
+		ver.AddValues(strconv.Itoa(version))
+		msg.AddSubmessages(ver)
+	}
+	if goalie {
+		g := message{name: "goalie"}
+		msg.AddSubmessages(g)
+	}
+
+	return msg
+}
+
 func (s server) Join(team Team) error {
 	go s.bind(team)
 
-	_, err := s.conn.WriteTo([]byte(fmt.Sprintf("(init %s (version 15))", team.Name())), s.raddr)
+	cmd := newInitCommand(team.Name(), false, 15)
 
-	return err
+	if b, err := cmd.MarshalBinary(); err != nil {
+		return err
+	} else if n, err := s.conn.WriteTo(b, s.raddr); err != nil {
+		return err
+	} else if 0 == n {
+		return fmt.Errorf("nothing has been written")
+	} else {
+		return nil
+	}
 }
 
 func (s server) Reconnect(team Team, unum UniformNumber) error {
@@ -117,11 +144,11 @@ func (s server) Bye() error {
 	return nil
 }
 
-func (s server) Catch() error {
+func (s server) Catch(dir Direction) error {
 	return nil
 }
 
-func (s server) ChangeView() error {
+func (s server) ChangeView(w SightWidth, q SightQuality) error {
 	return nil
 }
 
@@ -132,7 +159,6 @@ func (s server) Dash() error {
 func (s server) Kick() error {
 	return nil
 }
-
 
 func (s server) Move(x, y int) error {
 	_, err := s.conn.WriteTo([]byte(fmt.Sprintf("(move %d %d)", x, y)), s.raddr)
