@@ -5,21 +5,21 @@ import (
 	"fmt"
 )
 
-type message struct {
+type Message struct {
 	name        string
 	values      []string
-	submessages []message
+	submessages []Message
 }
 
-func (c *message) AddValues(values ...string) {
+func (c *Message) AddValues(values ...string) {
 	c.values = append(c.values, values...)
 }
 
-func (c *message) AddSubmessages(messages ...message) {
+func (c *Message) AddSubmessages(messages ...Message) {
 	c.submessages = append(c.submessages, messages...)
 }
 
-func (c message) MarshalBinary() ([]byte, error) {
+func (c Message) MarshalBinary() ([]byte, error) {
 	var b bytes.Buffer
 
 	b.WriteRune('(')
@@ -43,10 +43,10 @@ func (c message) MarshalBinary() ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func (c *message) UnmarshalBinary(data []byte) error {
+func (c *Message) UnmarshalBinary(data []byte) error {
 	c.name = ""
 	c.values = make([]string, 0)
-	c.submessages = make([]message, 0)
+	c.submessages = make([]Message, 0)
 
 	r := bytes.NewBuffer(data)
 
@@ -133,7 +133,7 @@ messages:
 				}
 			}
 
-			var submessage message
+			var submessage Message
 			if err := submessage.UnmarshalBinary(subbuffer.Bytes()); err != nil {
 				return err
 			} else {
@@ -153,4 +153,12 @@ messages:
 	}
 
 	return nil
+}
+
+type Marshaler interface {
+	MarshalRcss() (Message, error)
+}
+
+type Unmarshaler interface {
+	UnmarshalRcss(Message) error
 }

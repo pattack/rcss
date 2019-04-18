@@ -1,12 +1,12 @@
 package rcss
 
 import (
-	"testing"
 	"bytes"
+	"testing"
 )
 
 func TestMessage_MarshalBinary(t *testing.T) {
-	fixtures := map[string]message{
+	fixtures := map[string]Message{
 		"(init)": {name: "init"},
 
 		"(init teamname)": {
@@ -21,7 +21,7 @@ func TestMessage_MarshalBinary(t *testing.T) {
 			values: []string{
 				"teamname",
 			},
-			submessages: []message{
+			submessages: []Message{
 				{name: "version", values: []string{"15"}},
 			},
 		},
@@ -31,7 +31,7 @@ func TestMessage_MarshalBinary(t *testing.T) {
 			values: []string{
 				"teamname",
 			},
-			submessages: []message{
+			submessages: []Message{
 				{name: "goalie"},
 			},
 		},
@@ -41,7 +41,7 @@ func TestMessage_MarshalBinary(t *testing.T) {
 			values: []string{
 				"teamname",
 			},
-			submessages: []message{
+			submessages: []Message{
 				{name: "version", values: []string{"15"}},
 				{name: "goalie"},
 			},
@@ -53,10 +53,10 @@ func TestMessage_MarshalBinary(t *testing.T) {
 				"Pouyan",
 				"Heyratpour",
 			},
-			submessages: []message{
-				{name: "from", values: []string{"15"}, submessages: []message{
+			submessages: []Message{
+				{name: "from", values: []string{"15"}, submessages: []Message{
 					{name: "fullname", values: []string{"AliAsghar", "Abniki"}},
-					{name: "when", values: []string{"today"}, submessages: []message{
+					{name: "when", values: []string{"today"}, submessages: []Message{
 						{name: "at", values: []string{"noon"}},
 					}},
 				}},
@@ -89,7 +89,7 @@ func TestMessage_UnmarshalBinary(t *testing.T) {
 	for _, str := range fixtures {
 		b := bytes.NewBufferString(str).Bytes()
 
-		var msg message
+		var msg Message
 		if err := msg.UnmarshalBinary(b); err != nil {
 			t.Errorf("msg decode error: %s", err)
 		} else if out, err := msg.MarshalBinary(); err != nil {

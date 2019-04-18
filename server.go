@@ -45,7 +45,7 @@ func (s server) bind(team Team) {
 
 			return
 		} else {
-			var msg message
+			var msg Message
 			if err := msg.UnmarshalBinary(l); err != nil {
 				fmt.Printf("message parse error: %s\n", err)
 
@@ -81,10 +81,19 @@ func (s server) bind(team Team) {
 				go team.Init(s, side, unum, mode)
 
 			case "server_param":
+				var sp ServerParameters
+
+				go team.ServerParam(sp)
 
 			case "player_param":
+				var pp PlayerParameters
+
+				go team.PlayerParam(pp)
 
 			case "player_type":
+				var pt PlayerType
+
+				go team.PlayerType(pt)
 
 			case "see":
 
@@ -103,17 +112,17 @@ func (s server) bind(team Team) {
 	}
 }
 
-func newInitCommand(teamName string, goalie bool, version int) message {
-	msg := message{name: "init"}
+func newInitCommand(teamName string, goalie bool, version int) Message {
+	msg := Message{name: "init"}
 
 	msg.AddValues(teamName)
 	if version > 0 {
-		ver := message{name: "version"}
+		ver := Message{name: "version"}
 		ver.AddValues(strconv.Itoa(version))
 		msg.AddSubmessages(ver)
 	}
 	if goalie {
-		g := message{name: "goalie"}
+		g := Message{name: "goalie"}
 		msg.AddSubmessages(g)
 	}
 
