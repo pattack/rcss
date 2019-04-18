@@ -1,5 +1,9 @@
 package rcss
 
+import (
+	"fmt"
+)
+
 type Side rune
 
 const (
@@ -48,6 +52,28 @@ const (
 	Max                       PlayMode = "max"
 )
 
+type Init struct {
+	Side          Side
+	UniformNumber UniformNumber
+	PlayMode      PlayMode
+}
+
+func (m *Init) UnmarshalRcss(msg Message) error {
+	if _, err := fmt.Sscanf(msg.values[0], "%c", &m.Side); err != nil {
+		return fmt.Errorf("error on parsing side: %s", err)
+	}
+
+	if _, err := fmt.Sscan(msg.values[1], &m.UniformNumber); err != nil {
+		return fmt.Errorf("error on parsing unum %s", err)
+	}
+
+	if _, err := fmt.Sscan(msg.values[2], &m.PlayMode); err != nil {
+		return fmt.Errorf("error on parsing mode %s", err)
+	}
+
+	return nil
+}
+
 type ServerParameters struct {
 	// Goal width
 	GoalWidth float32
@@ -88,11 +114,23 @@ type ServerParameters struct {
 	EffortDecThr float32
 }
 
+func (m *ServerParameters) UnmarshalRcss(msg Message) error {
+	return fmt.Errorf("not implemented")
+}
+
 type PlayerParameters struct {
+}
+
+func (m *PlayerParameters) UnmarshalRcss(msg Message) error {
+	return fmt.Errorf("not implemented")
 }
 
 type PlayerType struct {
 	ID int
+}
+
+func (m *PlayerType) UnmarshalRcss(msg Message) error {
+	return fmt.Errorf("not implemented")
 }
 
 // Input Driver

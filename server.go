@@ -2,6 +2,7 @@ package rcss
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"strconv"
 )
@@ -56,44 +57,44 @@ func (s server) bind(team Team) {
 
 			switch msg.name {
 			case "init":
-				var side Side
-				var unum UniformNumber
-				var mode PlayMode
-
-				if _, err := fmt.Sscanf(msg.values[0], "%c", &side); err != nil {
-					fmt.Printf("side error %s\n", err)
+				var m Init
+				if err := m.UnmarshalRcss(msg); err != nil {
+					log.Printf("error on unmarshal Init message: %s\n", err)
 
 					continue
 				}
 
-				if _, err := fmt.Sscan(msg.values[1], &unum); err != nil {
-					fmt.Printf("unum error %s\n", err)
-
-					continue
-				}
-
-				if _, err := fmt.Sscan(msg.values[2], &mode); err != nil {
-					fmt.Printf("mode error %s\n", err)
-
-					continue
-				}
-
-				go team.Init(s, side, unum, mode)
+				go team.Init(s, m.Side, m.UniformNumber, m.PlayMode)
 
 			case "server_param":
-				var sp ServerParameters
+				var m ServerParameters
+				if err := m.UnmarshalRcss(msg); err != nil {
+					log.Printf("error on unmarshal ServerParameters message: %s\n", err)
 
-				go team.ServerParam(sp)
+					continue
+				}
+
+				go team.ServerParam(m)
 
 			case "player_param":
-				var pp PlayerParameters
+				var m PlayerParameters
+				if err := m.UnmarshalRcss(msg); err != nil {
+					log.Printf("error on unmarshal PlayerParameters message: %s\n", err)
 
-				go team.PlayerParam(pp)
+					continue
+				}
+
+				go team.PlayerParam(m)
 
 			case "player_type":
-				var pt PlayerType
+				var m PlayerType
+				if err := m.UnmarshalRcss(msg); err != nil {
+					log.Printf("error on unmarshal PlayerType message: %s\n", err)
 
-				go team.PlayerType(pt)
+					continue
+				}
+
+				go team.PlayerType(m)
 
 			case "see":
 
