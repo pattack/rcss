@@ -162,3 +162,58 @@ type Marshaler interface {
 type Unmarshaler interface {
 	UnmarshalRcss(Message) error
 }
+
+func NewMessage(name string) *Message {
+	return &Message{
+		name:        name,
+		values:      make([]string, 0),
+		submessages: make([]Message, 0),
+	}
+}
+
+type buffer struct {
+	title  string
+	name   string
+	format string
+	value  interface{}
+
+	vars []buffer
+}
+
+func (buf buffer) MarshalRcss() (Message, error) {
+	msg := NewMessage(buf.name)
+	for k, v := range buf.vars {
+		var value string
+		if len(v.format) > 0 {
+			value = fmt.Sprintf(v.format, v.value)
+		} else {
+			value = fmt.Sprint(v.value)
+		}
+
+		if len(v.name) > 0 {
+			submsg := NewMessage(v.name)
+			submsg.AddValues(value)
+			msg.AddSubmessages(submsg)
+		} else {
+			msg.AddValues(value)
+		}
+	}
+
+	return msg, nil
+}
+
+func (buf *buffer) UnmarshalRcss(msg Message) error {
+	for k, v := range buf.vars {
+		if len(v.format) > 0 {
+			if _, err := fmt.Sscanf(msg.values[k], v.name, &v.value); err != nil {
+				return fmt.Errorf("error on parsing %s: %s", v.name, err)
+			}
+		} else {
+			if _, err := fmt.Sscan(msg.values[k], &v.value); err != nil {
+				return fmt.Errorf("error on parsing %s: %s", v.name, err)
+			}
+		}
+	}
+
+	return nil
+}
