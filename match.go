@@ -4,6 +4,12 @@ type Direction float64
 
 type SightWidth string
 
+type Power int
+
+type Moment int
+
+type NeckMoment int
+
 const (
 	NarrowSight SightWidth = "narrow"
 	NormalSight SightWidth = "normal"
@@ -25,12 +31,12 @@ type Match interface {
 
 	Catch(dir Direction) error
 	ChangeView(w SightWidth, q SightQuality) error
-	Dash() error
-	Kick() error
+	Dash(p Power) error
+	Kick(p Power, d Direction) error
 	Move(x, y int) error
-	Say() error
-	Turn() error
-	TurnNeck() error
+	Say(msg string) error
+	Turn(m Moment) error
+	TurnNeck(n NeckMoment) error
 
 	Score() error
 

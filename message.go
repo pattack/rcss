@@ -173,16 +173,16 @@ func NewMessage(name string) *Message {
 
 type buffer struct {
 	title  string
+	value  interface{}
 	name   string
 	format string
-	value  interface{}
 
 	vars []buffer
 }
 
 func (buf buffer) MarshalRcss() (Message, error) {
 	msg := NewMessage(buf.name)
-	for k, v := range buf.vars {
+	for _, v := range buf.vars {
 		var value string
 		if len(v.format) > 0 {
 			value = fmt.Sprintf(v.format, v.value)
@@ -193,13 +193,13 @@ func (buf buffer) MarshalRcss() (Message, error) {
 		if len(v.name) > 0 {
 			submsg := NewMessage(v.name)
 			submsg.AddValues(value)
-			msg.AddSubmessages(submsg)
+			msg.AddSubmessages(*submsg)
 		} else {
 			msg.AddValues(value)
 		}
 	}
 
-	return msg, nil
+	return *msg, nil
 }
 
 func (buf *buffer) UnmarshalRcss(msg Message) error {
