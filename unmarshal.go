@@ -35,14 +35,12 @@ func SeperateSeeParam(m *See, str string) {
 	Sexp, err = chewxySexp.ParseString(child)
 	for child != "()" {
 		head := fmt.Sprint(Sexp[0].Head())
-		fmt.Println(head)
 		m.see.Array = append(m.see.Array, head)
 		child = fmt.Sprint(Sexp[0].Tail())
-		fmt.Println(child)
 		Sexp, err = chewxySexp.ParseString(child)
 
 	}
-	fmt.Println(m.see.Array)
+
 }
 func ProcessSee(obj string) {
 	Sexp, err := chewxySexp.ParseString(obj)
