@@ -648,6 +648,12 @@ func (h *Hear) SetValues() {
 	h.Message = h.Hear.Array[2]
 }
 
+type See struct {
+	see struct {
+		Array []string `sexp:"see,siblings"`
+	}
+}
+
 // Input Driver
 type Team interface {
 	Name() string
