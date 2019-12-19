@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/chewxy/chexySexp"
+	chewxySexp "github.com/chewxy/chexySexp"
 	"github.com/nsf/sexp"
 )
 
@@ -53,7 +53,7 @@ func (s server) bind(team Team) {
 			fmt.Printf("error: %s\n", err)
 			return
 		} else {
-
+			//saw := false
 			str = string(l[:n])
 			ast, err = sexp.Parse(strings.NewReader(str), nil)
 			if nil != err {
@@ -168,26 +168,26 @@ func (s server) bind(team Team) {
 					// }
 				}
 
-				// fmt.Println(fmt.Sprint(Sexp[0].Head()))
-				// var m PlayerType
-				// // if err := m.UnmarshalRcss(msg); err != nil {
-				// // 	log.Printf("error on unmarshal PlayerType message: %s\n", err)
-
-				// // 	continue
-				// // }
-
-				// // go team.PlayerType(m)
-				// err := ast.Unmarshal(&m.PlayerType)
-				// if nil != err {
-				// 	panic(err)
-				// } else {
-				// 	m.SetValues()
-				// }
-				// fmt.Println("player_type finish")
-
 			case "see":
+				var m See
+				SeperateSeeParam(&m, str)
+				// var m See
+				// child := fmt.Sprint(fmt.Sprint(Sexp[0].Tail()))
+				// child = child[1 : len(child)-1]
+
+				// newast, err := sexp.Parse(strings.NewReader(child), nil)
+				// if nil != err {
+				// 	fmt.Println("Error", err)
+				// } else {
+				// 	newast.Unmarshal(&m.see)
+				// 	if false == saw {
+				// 		fmt.Println("Array : ", m.see.Array)
+				// 		saw = true
+				// 	}
+				// }
 
 			case "hear":
+				fmt.Println("Hear")
 				var m Hear
 				err := ast.Unmarshal(&m.Hear)
 				if nil != err {
@@ -387,7 +387,8 @@ func (s server) Score() error {
 }
 
 func (s server) See() error {
-	return nil
+	_, err := s.conn.WriteTo([]byte("(see)"), s.raddr)
+	return err
 }
 
 func (s server) SenseBody() error {
