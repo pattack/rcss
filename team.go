@@ -654,6 +654,181 @@ type See struct {
 	}
 }
 
+type Flag struct {
+	flag    string
+	Type    string
+	Left    bool
+	Right   bool
+	Top     bool
+	Bottom  bool
+	Center  bool
+	Goal    bool
+	Penalty bool
+	Number  float64
+	Dir     float64
+	Dis     float64
+}
+
+func (f Flag) Flag() string {
+	return f.flag
+}
+
+func (f Flag) Head() string {
+	return f.Type
+}
+
+func (f Flag) IsLeft() bool {
+	return f.Left
+}
+
+func (f Flag) IsRight() bool {
+	return f.Right
+}
+
+func (f Flag) IsTop() bool {
+	return f.Top
+}
+
+func (f Flag) IsBottom() bool {
+	return f.Bottom
+}
+
+func (f Flag) IsCenter() bool {
+	return f.Center
+}
+
+func (f Flag) IsGoal() bool {
+	return f.Goal
+}
+
+func (f Flag) IsPenalty() bool {
+	return f.Penalty
+}
+
+func (f Flag) Direction() float64 {
+	return f.Dir
+}
+
+func (f Flag) Distance() float64 {
+	return f.Dis
+}
+
+func (f Flag) DistanceChng() float64 {
+	return 0
+}
+
+func (f Flag) DirectionChng() float64 {
+	return 0
+}
+
+func (f *Flag) Set() {
+	f.flag = ""
+	f.Type = "f"
+	f.Left = false
+	f.Right = false
+	f.Top = false
+	f.Bottom = false
+	f.Center = false
+	f.Goal = false
+	f.Penalty = false
+	f.Number = -1
+	f.Dir = 0
+	f.Dis = 0
+}
+
+type Goal struct {
+	Type  string
+	Left  bool
+	Right bool
+	Dir   float64
+	Dis   float64
+	// DisChng float64
+	// DirChng float64
+}
+
+func (g Goal) Head() string {
+	return g.Type
+}
+func (g Goal) IsLeft() bool {
+	return g.Left
+}
+func (g Goal) IsRight() bool {
+	return g.Right
+}
+func (g Goal) Direction() float64 {
+	return g.Dir
+}
+func (g Goal) Distance() float64 {
+	return g.Dis
+}
+
+func (g Goal) DistanceChng() float64 {
+	return 0
+}
+
+func (g Goal) DirectionChng() float64 {
+	return 0
+}
+
+func (g *Goal) Set() {
+	g.Type = "g"
+	g.Left = false
+	g.Right = false
+	g.Dis = 0
+	g.Dir = 0
+}
+
+type Ball struct {
+	Type    string
+	Dis     float64
+	Dir     float64
+	DisChng float64
+	DirChng float64
+}
+
+func (b Ball) Head() string {
+	return b.Type
+}
+
+func (b Ball) Direction() float64 {
+	return b.Dir
+}
+func (b Ball) Distance() float64 {
+	return b.Dis
+}
+
+func (b Ball) DirectionChng() float64 {
+	return b.DirChng
+}
+
+func (b Ball) DistanceChng() float64 {
+	return b.DisChng
+}
+
+func (b *Ball) Set() {
+	b.Type = "b"
+	b.Dis = 0
+	b.Dir = 0
+	b.DirChng = 0
+	b.DisChng = 0
+
+}
+
+// func (g Goal) DirectionChng() float64 {
+// 	return g.DirChng
+// }
+// func (g Goal) DistanceChng() float64 {
+// 	return g.DisChng
+// }
+
+type Object interface {
+	Head() string
+	Direction() float64
+	Distance() float64
+	DistanceChng() float64
+	DirectionChng() float64
+}
+
 // Input Driver
 type Team interface {
 	Name() string
