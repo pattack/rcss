@@ -2,6 +2,7 @@ package rcss
 
 import (
 	"fmt"
+	"strconv"
 
 	chewxySexp "github.com/chewxy/chexySexp"
 )
@@ -42,21 +43,141 @@ func SeperateSeeParam(m *See, str string) {
 	}
 
 }
-func ProcessSee(obj string) {
-	Sexp, err := chewxySexp.ParseString(obj)
-	if nil != err {
-		fmt.Printf("Error : %s\n", err)
+func ProcessFlags(obj string) Flag {
+	var f Flag
+	f.Set()
+	Sexp, err := ToSexp(obj)
+	if err != nil {
+		fmt.Println("Obj Error : ", err)
 	}
-	head := fmt.Sprint(fmt.Sprint(Sexp[0].Head()))
-	Sexp, err = chewxySexp.ParseString(head)
-	if nil != err {
-		panic(err)
-	}
-	head = fmt.Sprint(Sexp[0].Head())
 
-	if head == "f" {
-		fmt.Println("flag")
-	} else {
-		fmt.Println(head)
+	child := SexpTail(Sexp)
+	Head := SexpHead(Sexp)
+	Sexp, err = ToSexp(Head)
+	Head = SexpTail(Sexp)
+	Sexp, err = ToSexp(Head)
+	for Head != "()" && Head != "<nil>" {
+		head := SexpHead(Sexp)
+		if head == "l" {
+			f.Left = true
+		} else if head == "r" {
+			f.Right = true
+		} else if head == "t" {
+			f.Top = true
+		} else if head == "b" {
+			f.Bottom = true
+		} else if head == "c" {
+			f.Center = true
+		} else if head == "g" {
+			f.Goal = true
+		} else if head == "p" {
+			f.Penalty = true
+		} else {
+			f.Number, err = strconv.ParseFloat(head, 64)
+			if nil != err {
+				fmt.Println("Error on parsing string to int : ", err)
+			}
+		}
+		Head = SexpTail(Sexp)
+		Sexp, err = ToSexp(Head)
+
 	}
+	Sexp, err = chewxySexp.ParseString(child)
+	Dis := SexpHead(Sexp)
+	Dir := fmt.Sprint(Sexp[0].Tail().Head())
+	f.Dis, _ = strconv.ParseFloat(Dis, 64)
+	f.Dir, _ = strconv.ParseFloat(Dir, 64)
+	return f
+}
+func ProcessGoals(obj string) Goal {
+	var g Goal
+	g.Set()
+	Sexp, err := ToSexp(obj)
+	if err != nil {
+		fmt.Println("Obj Error : ", err)
+	}
+
+	child := SexpTail(Sexp)
+	Head := SexpHead(Sexp)
+	Sexp, err = ToSexp(Head)
+	Head = fmt.Sprint(Sexp[0].Tail().Head())
+	if Head == "l" {
+		g.Left = true
+	} else {
+		g.Right = true
+	}
+	Sexp, err = chewxySexp.ParseString(child)
+	Dis := SexpHead(Sexp)
+	Dir := fmt.Sprint(Sexp[0].Tail().Head())
+	g.Dis, _ = strconv.ParseFloat(Dis, 64)
+	g.Dir, _ = strconv.ParseFloat(Dir, 64)
+	return g
+
+}
+func ProcessBall(obj string) Ball {
+	var b Ball
+	b.Set()
+	Sexp, err := ToSexp(obj)
+	if err != nil {
+		fmt.Println("Obj Error : ", err)
+	}
+	var Datas []float64
+	child := SexpTail(Sexp)
+
+	for child != "()" && child != "<nil>" {
+		head := SexpHeadString(child)
+		x, _ := strconv.ParseFloat(head, 64)
+		Datas = append(Datas, x)
+		child = SexpTailString(child)
+	}
+	b.Dis = Datas[0]
+	b.Dir = Datas[1]
+	if len(Datas) == 4 {
+
+		b.DisChng = Datas[2]
+		b.DirChng = Datas[3]
+	}
+
+	return b
+
+}
+func ProcessSee(obj string) Object {
+
+	Sexp, err := ToSexp(obj)
+	if err != nil {
+		fmt.Println("Obj Error : ", err)
+	}
+	Head := SexpHead(Sexp)
+	if Head == "b" {
+		return ProcessBall(obj)
+	} else if Head == "F" {
+		fmt.Println("UnSuported")
+	} else {
+		Sexp, err = ToSexp(Head)
+		if Type := SexpHead(Sexp); Type == "f" {
+			return ProcessFlags(obj)
+		} else if Type == "g" {
+			return ProcessGoals(obj)
+		}
+	}
+
+	return Flag{}
+}
+func ToSexp(text string) ([]chewxySexp.Sexp, error) {
+	Sexp, err := chewxySexp.ParseString(text)
+	return Sexp, err
+}
+func SexpHead(Sexp []chewxySexp.Sexp) string {
+	return fmt.Sprint(Sexp[0].Head())
+}
+func SexpTail(Sexp []chewxySexp.Sexp) string {
+	return fmt.Sprint(Sexp[0].Tail())
+}
+func SexpHeadString(text string) string {
+	Sexp, _ := ToSexp(text)
+	return SexpHead(Sexp)
+}
+func SexpTailString(text string) string {
+	Sexp, _ := ToSexp(text)
+	return SexpTail(Sexp)
 }
