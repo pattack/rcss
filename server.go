@@ -171,6 +171,17 @@ func (s server) bind(team Team) {
 			case "see":
 				var m See
 				SeperateSeeParam(&m, str)
+				for i, v := range m.see.Array {
+					if i == 0 {
+						continue
+					}
+					obj := ProcessSee(v)
+					if obj.Head() == "b" {
+						fmt.Println(v)
+						fmt.Println(obj)
+					}
+
+				}
 				// var m See
 				// child := fmt.Sprint(fmt.Sprint(Sexp[0].Tail()))
 				// child = child[1 : len(child)-1]
