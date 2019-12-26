@@ -175,8 +175,8 @@ func (s server) bind(team Team) {
 					if i == 0 {
 						continue
 					}
-					obj := ProcessSee(v)
-					if obj.Head() == "b" {
+					obj := ProcessSee(v, m.see.Array[0])
+					if obj.Head() == "l" {
 						fmt.Println(v)
 						fmt.Println(obj)
 					}
