@@ -667,6 +667,7 @@ type Flag struct {
 	Number  float64
 	Dir     float64
 	Dis     float64
+	Time    int
 }
 
 func (f Flag) Flag() string {
@@ -721,6 +722,10 @@ func (f Flag) DirectionChng() float64 {
 	return 0
 }
 
+func (f Flag) DataAriveTime() int {
+	return f.Time
+}
+
 func (f *Flag) Set() {
 	f.flag = ""
 	f.Type = "f"
@@ -734,6 +739,7 @@ func (f *Flag) Set() {
 	f.Number = -1
 	f.Dir = 0
 	f.Dis = 0
+	f.Time = -1
 }
 
 type Goal struct {
@@ -742,6 +748,7 @@ type Goal struct {
 	Right bool
 	Dir   float64
 	Dis   float64
+	Time  int
 	// DisChng float64
 	// DirChng float64
 }
@@ -770,12 +777,17 @@ func (g Goal) DirectionChng() float64 {
 	return 0
 }
 
+func (g Goal) DataAriveTime() int {
+	return g.Time
+}
+
 func (g *Goal) Set() {
 	g.Type = "g"
 	g.Left = false
 	g.Right = false
 	g.Dis = 0
 	g.Dir = 0
+	g.Time = -1
 }
 
 type Ball struct {
@@ -784,6 +796,7 @@ type Ball struct {
 	Dir     float64
 	DisChng float64
 	DirChng float64
+	Time    int
 }
 
 func (b Ball) Head() string {
@@ -805,13 +818,78 @@ func (b Ball) DistanceChng() float64 {
 	return b.DisChng
 }
 
+func (b Ball) DataAriveTime() int {
+	return b.Time
+}
+
 func (b *Ball) Set() {
 	b.Type = "b"
 	b.Dis = 0
 	b.Dir = 0
 	b.DirChng = 0
 	b.DisChng = 0
+	b.Time = -1
 
+}
+
+type Line struct {
+	Type   string
+	Left   bool
+	Right  bool
+	Top    bool
+	Bottom bool
+	Dis    float64
+	Dir    float64
+	Time   int
+}
+
+func (l Line) Head() string {
+	return l.Type
+}
+
+func (l Line) IsLeft() bool {
+	return l.Left
+}
+
+func (l Line) IsRight() bool {
+	return l.Right
+}
+
+func (l Line) IsTop() bool {
+	return l.Top
+}
+
+func (l Line) IsBottom() bool {
+	return l.Bottom
+}
+
+func (l Line) Direction() float64 {
+	return l.Dir
+}
+func (l Line) Distance() float64 {
+	return l.Dis
+}
+
+func (l Line) DirectionChng() float64 {
+	return 0
+}
+
+func (l Line) DistanceChng() float64 {
+	return 0
+}
+func (l Line) DataAriveTime() int {
+	return l.Time
+}
+
+func (l *Line) Set() {
+	l.Type = "l"
+	l.Left = false
+	l.Right = false
+	l.Top = false
+	l.Bottom = false
+	l.Dis = 0
+	l.Dir = 0
+	l.Time = -1
 }
 
 // func (g Goal) DirectionChng() float64 {
@@ -827,6 +905,7 @@ type Object interface {
 	Distance() float64
 	DistanceChng() float64
 	DirectionChng() float64
+	DataAriveTime() int
 }
 
 // Input Driver
