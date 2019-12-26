@@ -722,7 +722,7 @@ func (f Flag) DirectionChng() float64 {
 	return 0
 }
 
-func (f Flag) DataAriveTime() int {
+func (f Flag) DataArriveTime() int {
 	return f.Time
 }
 
@@ -777,7 +777,7 @@ func (g Goal) DirectionChng() float64 {
 	return 0
 }
 
-func (g Goal) DataAriveTime() int {
+func (g Goal) DataArriveTime() int {
 	return g.Time
 }
 
@@ -818,7 +818,7 @@ func (b Ball) DistanceChng() float64 {
 	return b.DisChng
 }
 
-func (b Ball) DataAriveTime() int {
+func (b Ball) DataArriveTime() int {
 	return b.Time
 }
 
@@ -877,7 +877,7 @@ func (l Line) DirectionChng() float64 {
 func (l Line) DistanceChng() float64 {
 	return 0
 }
-func (l Line) DataAriveTime() int {
+func (l Line) DataArriveTime() int {
 	return l.Time
 }
 
@@ -905,7 +905,7 @@ type Object interface {
 	Distance() float64
 	DistanceChng() float64
 	DirectionChng() float64
-	DataAriveTime() int
+	DataArriveTime() int
 }
 
 // Input Driver
