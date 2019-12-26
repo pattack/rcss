@@ -43,9 +43,10 @@ func SeperateSeeParam(m *See, str string) {
 	}
 
 }
-func ProcessFlags(obj string) Flag {
+func ProcessFlags(obj string, time int) Flag {
 	var f Flag
 	f.Set()
+	f.Time = time
 	Sexp, err := ToSexp(obj)
 	if err != nil {
 		fmt.Println("Obj Error : ", err)
@@ -89,9 +90,10 @@ func ProcessFlags(obj string) Flag {
 	f.Dir, _ = strconv.ParseFloat(Dir, 64)
 	return f
 }
-func ProcessGoals(obj string) Goal {
+func ProcessGoals(obj string, time int) Goal {
 	var g Goal
 	g.Set()
+	g.Time = time
 	Sexp, err := ToSexp(obj)
 	if err != nil {
 		fmt.Println("Obj Error : ", err)
@@ -114,9 +116,10 @@ func ProcessGoals(obj string) Goal {
 	return g
 
 }
-func ProcessBall(obj string) Ball {
+func ProcessBall(obj string, time int) Ball {
 	var b Ball
 	b.Set()
+	b.Time = time
 	Sexp, err := ToSexp(obj)
 	if err != nil {
 		fmt.Println("Obj Error : ", err)
@@ -141,23 +144,55 @@ func ProcessBall(obj string) Ball {
 	return b
 
 }
-func ProcessSee(obj string) Object {
 
+func ProcessLine(obj string, time int) Line {
+	var l Line
+	l.Set()
+	l.Time = time
+	Sexp, err := ToSexp(obj)
+	if err != nil {
+		fmt.Println("Obj Error : ", err)
+	}
+
+	child := SexpTail(Sexp)
+	Head := SexpHead(Sexp)
+	Head = SexpTailString(Head)
+	Head = SexpHeadString(Head)
+	if Head == "l" {
+		l.Left = true
+	} else if Head == "r" {
+		l.Right = true
+	} else if Head == "t" {
+		l.Top = true
+	} else if Head == "b" {
+		l.Bottom = true
+	}
+	Dis := SexpHeadString(child)
+	Dir := SexpHeadString(SexpTailString(child))
+	l.Dis, _ = strconv.ParseFloat(Dis, 64)
+	l.Dir, _ = strconv.ParseFloat(Dir, 64)
+	return l
+}
+
+func ProcessSee(obj string, time string) Object {
+	Time, _ := strconv.Atoi(time)
 	Sexp, err := ToSexp(obj)
 	if err != nil {
 		fmt.Println("Obj Error : ", err)
 	}
 	Head := SexpHead(Sexp)
 	if Head == "b" {
-		return ProcessBall(obj)
+		return ProcessBall(obj, Time)
 	} else if Head == "F" {
-		fmt.Println("UnSuported")
+		fmt.Println("UnSuported F")
 	} else {
 		Sexp, err = ToSexp(Head)
 		if Type := SexpHead(Sexp); Type == "f" {
-			return ProcessFlags(obj)
+			return ProcessFlags(obj, Time)
 		} else if Type == "g" {
-			return ProcessGoals(obj)
+			return ProcessGoals(obj, Time)
+		} else if Type == "l" {
+			return ProcessLine(obj, Time)
 		}
 	}
 
