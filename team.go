@@ -917,12 +917,13 @@ type Team interface {
 	Invite(m Match, unum UniformNumber)
 	SetPlayMode(mode PlayMode)
 
+	See(Object)
+
 	//Init(match Match, mode PlayMode)
 	ServerParam(sp ServerParameters)
 	PlayerParam(pp PlayerParameters)
 	PlayerType(pt PlayerType)
 
-	See()
 	Hear()
 	SenseBody()
 
