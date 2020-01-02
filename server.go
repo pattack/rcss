@@ -176,10 +176,11 @@ func (s server) bind(team Team) {
 						continue
 					}
 					obj := ProcessSee(v, m.see.Array[0])
-					if obj.Head() == "l" {
+					if obj.Head() == "x" {
 						fmt.Println(v)
 						fmt.Println(obj)
 					}
+					team.See(obj)
 
 				}
 				// var m See
