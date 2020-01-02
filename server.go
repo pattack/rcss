@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	chewxySexp "github.com/chewxy/chexySexp"
+	chsexp "github.com/chewxy/sexp"
 	"github.com/nsf/sexp"
 )
 
@@ -66,12 +66,12 @@ func (s server) bind(team Team) {
 			// }
 
 			//fmt.Printf("%#v\n", msg)
-			Sexp, err := chewxySexp.ParseString(str)
+			expr, err := chsexp.ParseString(str)
 			if nil != err {
 				fmt.Printf("Error : %s\n", err)
 			}
 
-			switch fmt.Sprint(Sexp[0].Head()) {
+			switch fmt.Sprint(expr[0].Head()) {
 			case "init":
 				var m Init
 				err := ast.Unmarshal(&m.Init)
@@ -93,7 +93,7 @@ func (s server) bind(team Team) {
 
 				var m ServerParameters
 
-				child := fmt.Sprint(fmt.Sprint(Sexp[0].Tail()))
+				child := fmt.Sprint(fmt.Sprint(expr[0].Tail()))
 				child = child[1 : len(child)-1]
 
 				newast, err := sexp.Parse(strings.NewReader(child), nil)
@@ -125,7 +125,7 @@ func (s server) bind(team Team) {
 			case "player_param":
 				var m PlayerParameters
 
-				child := fmt.Sprint(fmt.Sprint(Sexp[0].Tail()))
+				child := fmt.Sprint(fmt.Sprint(expr[0].Tail()))
 				child = child[1 : len(child)-1]
 
 				newast, err := sexp.Parse(strings.NewReader(child), nil)
@@ -140,7 +140,7 @@ func (s server) bind(team Team) {
 					// }
 				}
 
-				//fmt.Println(fmt.Sprint(Sexp[0].Head()))
+				//fmt.Println(fmt.Sprint(expr[0].Head()))
 
 				// if err := m.UnmarshalRcss(msg); err != nil {
 				// 	log.Printf("error on unmarshal PlayerParameters message: %s\n", err)
@@ -153,7 +153,7 @@ func (s server) bind(team Team) {
 			case "player_type":
 				var m PlayerType
 
-				child := fmt.Sprint(fmt.Sprint(Sexp[0].Tail()))
+				child := fmt.Sprint(fmt.Sprint(expr[0].Tail()))
 				child = child[1 : len(child)-1]
 
 				newast, err := sexp.Parse(strings.NewReader(child), nil)
@@ -349,9 +349,7 @@ func (s server) Kick(p Power, d Direction) error {
 }
 
 func (s server) Move(x, y int) error {
-	n, err := s.conn.WriteTo([]byte(fmt.Sprintf("(move %d %d)", x, y)), s.raddr)
-
-	fmt.Println(n, err)
+	_, err := s.conn.WriteTo([]byte(fmt.Sprintf("(move %d %d)", x, y)), s.raddr)
 
 	return err
 }
