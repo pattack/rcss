@@ -58,9 +58,11 @@ func ProcessFlags(obj string, time int) Flag {
 
 	child := SexpTail(Sexp)
 	Head := SexpHead(Sexp)
+	f.flag = SexpTailString(Head)
 	Sexp, err = ToSexp(Head)
 	Head = SexpTail(Sexp)
 	Sexp, err = ToSexp(Head)
+
 	for Head != "()" && Head != "<nil>" {
 		head := SexpHead(Sexp)
 		if head == "l" {
